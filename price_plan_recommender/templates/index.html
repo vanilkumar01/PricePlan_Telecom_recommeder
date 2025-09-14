@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Plan Recommender</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f4f6; margin:0; padding:0; }
+        .container { width: 90%; max-width: 1000px; margin: auto; padding: 20px; }
+        .input-section, .recommendation-section { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
+        h1 { text-align:center; color:#1f2937; }
+        label { display:block; margin-top:10px; font-weight:bold; }
+        input, select { width: 100%; padding:8px; margin-top:5px; }
+        .plan-card { padding: 15px; border-radius: 15px; margin-bottom: 15px; background: linear-gradient(135deg, #a1c4fd, #c2e9fb); box-shadow: 0 4px 8px rgba(0,0,0,0.2);}
+        .plan-title { font-size:18px; font-weight:bold; color:#1f2937; }
+        .plan-price { font-size:16px; font-weight:600; color:#2563eb; }
+        .chart { text-align:center; margin-bottom:15px; }
+        .checkbox-group label { display:inline-block; margin-right:10px; }
+        button { padding:10px 20px; background:#2563eb; color:white; border:none; border-radius:5px; cursor:pointer; margin-top:15px;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Smart Telecom Plan Recommender</h1>
+        <form method="POST">
+            <div class="input-section">
+                <h2>Enter Your Usage</h2>
+                <label>Monthly Calls (minutes)</label>
+                <input type="number" name="calls" value="{{ calls }}">
+                <label>Monthly SMS</label>
+                <input type="number" name="sms" value="{{ sms }}">
+                <label>Monthly Data (GB)</label>
+                <input type="number" name="data" value="{{ data }}">
+
+                <h2>OTT Preferences</h2>
+                <div class="checkbox-group">
+                    {% for ott in ott_options %}
+                        <label>
+                            <input type="checkbox" name="ott" value="{{ ott }}" {% if ott in selected_ott %}checked{% endif %}>
+                            {{ ott }}
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <button type="submit">See Recommendations</button>
+            </div>
+        </form>
+
+        {% if recommendations %}
+        <div class="recommendation-section">
+            <h2>✨ Recommended Plans</h2>
+            {% for plan in recommendations %}
+                <div class="plan-card">
+                    <div class="plan-title">📌 Plan {{ plan.plan }}</div>
+                    <div class="plan-price">💰 ₹{{ plan.price }}</div>
+                    <p>📞 Calls: {{ plan.calls }} mins<br>
+                       ✉ SMS: {{ plan.sms }}<br>
+                       🌐 Data: {{ plan.data }} GB<br>
+                       🎬 OTT: {{ plan.ott | join(', ') if plan.ott else 'None' }}</p>
+                    <p>{{ plan.description }}</p>
+                </div>
+            {% endfor %}
+
+            <h2>📊 Usage Comparison Charts</h2>
+            {% for key, chart in charts.items() %}
+                <div class="chart">
+                    <img src="data:image/png;base64,{{ chart }}" alt="{{ key }} chart">
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
